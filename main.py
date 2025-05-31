@@ -49,3 +49,14 @@ def handle_message(event):
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
 print("Server is ready.")
+@app.route("/webhook", methods=["POST"])
+def webhook():
+    body = request.get_data(as_text=True)
+    signature = request.headers.get("X-Line-Signature")
+
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+
+    return "OK"
